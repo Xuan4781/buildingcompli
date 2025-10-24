@@ -19,7 +19,7 @@ app.use(express.static('public'));
 let buildingData = [];
 let dataLoaded = false;
 
-// Load Excel asynchronously
+// Load Excel File
 function loadExcelData() {
     try {
         const workbook = xlsx.readFile(join(__dirname, "attempt.xlsx"));
@@ -32,7 +32,7 @@ function loadExcelData() {
     }
 }
 
-// Compliance logic
+// Compliance Logic -- I need to come back to this
 function determineCompliance(excelData) {
     const fispStatus = excelData['FISP Compliance Status'];
     const fispLastFilingStatus = excelData['FISP Last Filing Status'];
@@ -43,7 +43,7 @@ function determineCompliance(excelData) {
     return 'In Compliance';
 }
 
-// Map Excel data (keep all fields)
+// Map Excel data 
 function mapExcel(excelData) {
     return {
         'Address': excelData['Address'],
@@ -57,7 +57,7 @@ function mapExcel(excelData) {
         'Approx_Sq_Ft': excelData['Approx Sq Ft'],
         'Landmark': excelData['Landmark'],
         'Parking Garage (Yes/No)': excelData['Parking Garage'],
-        'FISP Compliance Status': determineCompliance(excelData),
+        'FISP Compliance Status': determineCompliance(excelData),  //need to look at this again
         'Sub': excelData['Sub'],
         'FISP Filing Due': excelData['FISP Filing Due'],
         'FISP Last Filing Status': excelData['FISP Last Filing Status'],
@@ -137,12 +137,6 @@ app.post('/api/generate-report', (req, res) => {
     }
 });
 
-// SPA fallback (React)
-const clientBuildPath = join(__dirname, '../client/build');
-app.use(express.static(clientBuildPath));
-app.get('*', (req, res) => {
-    res.sendFile(join(clientBuildPath, 'index.html'));
-});
 
 // Start server
 const PORT = process.env.PORT || 5001;
