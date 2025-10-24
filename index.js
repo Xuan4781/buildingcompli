@@ -17,18 +17,17 @@ app.use(express.json());
 app.use(express.static('public'));
 
 let buildingData = [];
+let dataLoaded = false;
 
-// Load Excel data
 function loadExcelData() {
     try {
         const workbook = xlsx.readFile(join(__dirname, "final_merged.xlsx"));
         const sheetName = workbook.SheetNames[0];
         buildingData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { cellDates: true });
+        dataLoaded = true;
         console.log(`✅ Excel data loaded: ${buildingData.length} records`);
-        return true;
     } catch (err) {
         console.error("Failed to load Excel:", err.message);
-        return false;
     }
 }
 
@@ -52,18 +51,19 @@ function mapExcel(excelData){
         'FISP Compliance Status': determineCompliance(excelData),
         'Contact Email': excelData['Contact Email'] || 'Chelsea.Coppinger@socotec.us',
         'Contact Phone': excelData['Contact Phone'] || '+1 646 549 6045',
-        // Add other fields...
+        // Add other fields as needed
     };
 }
 
 // API: refresh data
 app.get('/api/refresh-data', (req, res) => {
-    if (loadExcelData()) res.send('Excel refreshed');
-    else res.status(500).send('Failed to refresh Excel');
+    loadExcelData();
+    res.send(dataLoaded ? 'Excel refreshed' : 'Failed to refresh Excel');
 });
 
 // API: search
 app.post('/api/search-address', (req, res) => {
+    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading, try again in a few seconds.' });
     const { address } = req.body;
     if (!address) return res.status(400).json({ error: 'Address required' });
     const searchAddress = address.trim().toLowerCase();
@@ -74,15 +74,13 @@ app.post('/api/search-address', (req, res) => {
 
 // API: generate report
 app.post('/api/generate-report', (req, res) => {
+    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading, try again in a few seconds.' });
     const { address } = req.body;
     if (!address) return res.status(400).json({ error: 'Address required' });
-
     const reportData = buildingData.find(r => r.Address?.toLowerCase() === address.trim().toLowerCase());
     if (!reportData) return res.status(404).json({ error: 'Data not found' });
 
     const mappedData = mapExcel(reportData);
-
-    // Process values
     const processedData = {};
     for (const [key, value] of Object.entries(mappedData)) {
         const str = String(value).trim().toLowerCase();
@@ -110,8 +108,11 @@ app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = process.env.PORT;
+// Start server
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    if (!loadExcelData()) console.warn('Excel file may be missing!');
 });
+
+// Load Excel asynchronously
+setTimeout(() => loadExcelData(), 0);
