@@ -19,6 +19,7 @@ app.use(express.static('public'));
 let buildingData = [];
 let dataLoaded = false;
 
+// Load Excel asynchronously
 function loadExcelData() {
     try {
         const workbook = xlsx.readFile(join(__dirname, "attempt.xlsx"));
@@ -32,7 +33,7 @@ function loadExcelData() {
 }
 
 // Compliance logic
-function determineCompliance(excelData){
+function determineCompliance(excelData) {
     const fispStatus = excelData['FISP Compliance Status'];
     const fispLastFilingStatus = excelData['FISP Last Filing Status'];
     if(fispStatus === "UNSAFE" || fispStatus === "No Report Filed") return 'Non-Compliant';
@@ -42,28 +43,61 @@ function determineCompliance(excelData){
     return 'In Compliance';
 }
 
-// Map Excel
-function mapExcel(excelData){
+// Map Excel data (keep all fields)
+function mapExcel(excelData) {
     return {
         'Address': excelData['Address'],
         'Building_OwnerManager': excelData['Building Owner/Manager'],
+        'Use Type': excelData['Use Type'],
+        'Block': excelData['Block'],
+        'BIN': excelData['BIN'],
         'Borough': excelData['Borough'],
+        'Year Built': excelData['Year Built'],
+        'M Floors': excelData['M Floors'],
+        'Approx_Sq_Ft': excelData['Approx Sq Ft'],
+        'Landmark': excelData['Landmark'],
+        'Parking Garage (Yes/No)': excelData['Parking Garage'],
         'FISP Compliance Status': determineCompliance(excelData),
+        'Sub': excelData['Sub'],
+        'FISP Filing Due': excelData['FISP Filing Due'],
+        'FISP Last Filing Status': excelData['FISP Last Filing Status'],
+        'FISP Cycle Filing Window': excelData['FISP Cycle Filing Window'],
+        'LL126 Compliance Status': excelData['LL126 Compliance Status'],
+        'LL126 Cycle': excelData['LL126 Cycle'],
+        'LL126 Previous Filing Status': excelData['LL126 Previous Filing Status'],
+        'LL126 SREM Recommended Date': excelData['LL126 SREM Recommended Date'],
+        'LL126 Filing Window': excelData['LL126 Filing Window'],
+        'LL126 Filing Due': excelData['LL126 Filing Due'],
+        'LL126 Next Steps': excelData['LL126 Next Steps'],
+        'LL126 Parapet Compliance Status': excelData['LL126 Parapet Compliance Status'],
+        'LL84 Compliance Status': excelData['LL84 Compliance Status'],
+        'LL84 Filing Due': excelData['LL84 Filing Due'],
+        'LL84 Next Steps': excelData['LL84 Next Steps'],
+        'LL87 Compliance Status': excelData['LL87 Compliance Status'],
+        'LL87 Filing Due': excelData['LL87 Filing Due'],
+        'LL87 Compliance Year': excelData['LL87 Compliance Year'],
+        'LL87 Next Steps': excelData['LL87 Next Steps'],
+        'LL88 Compliance Status': excelData['LL88 Compliance Status'],
+        'LL88 Filing Due': excelData['LL88 Filing Due'],
+        'LL88 Notes': excelData['LL88 Notes'],
+        'LL97 Compliance Status': excelData['LL97 Compliance Status'],
+        'LL97 Filing Due': excelData['LL97 Filing Due'],
+        'LL97 Next Steps': excelData['LL97 Next Steps'],
         'Contact Email': excelData['Contact Email'] || 'Chelsea.Coppinger@socotec.us',
-        'Contact Phone': excelData['Contact Phone'] || '+1 646 549 6045',
-        // Add other fields as needed
+        'Contact Phone': excelData['Contact Phone'] || '+1 646 549 6045'
     };
 }
 
-// API: refresh data
+// Refresh endpoint
 app.get('/api/refresh-data', (req, res) => {
+    console.log("Refreshing Excel data...");
     loadExcelData();
     res.send(dataLoaded ? 'Excel refreshed' : 'Failed to refresh Excel');
 });
 
-// API: search
+// Search endpoint
 app.post('/api/search-address', (req, res) => {
-    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading, try again in a few seconds.' });
+    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading' });
     const { address } = req.body;
     if (!address) return res.status(400).json({ error: 'Address required' });
     const searchAddress = address.trim().toLowerCase();
@@ -72,9 +106,9 @@ app.post('/api/search-address', (req, res) => {
     else res.status(404).json({ error: 'Address not found' });
 });
 
-// API: generate report
+// Generate report
 app.post('/api/generate-report', (req, res) => {
-    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading, try again in a few seconds.' });
+    if (!dataLoaded) return res.status(503).json({ error: 'Data still loading' });
     const { address } = req.body;
     if (!address) return res.status(400).json({ error: 'Address required' });
     const reportData = buildingData.find(r => r.Address?.toLowerCase() === address.trim().toLowerCase());
@@ -98,21 +132,21 @@ app.post('/api/generate-report', (req, res) => {
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.send(buf);
     } catch (err) {
-        console.error(err);
+        console.error('Error generating report:', err.message);
         res.status(500).json({ error: 'Failed to generate report' });
     }
 });
 
-// SPA fallback
+// SPA fallback (React)
+const clientBuildPath = join(__dirname, '../client/build');
+app.use(express.static(clientBuildPath));
 app.get('*', (req, res) => {
-    res.sendFile(join(__dirname, 'public', 'index.html'));
+    res.sendFile(join(clientBuildPath, 'index.html'));
 });
 
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    setTimeout(() => loadExcelData(), 0); // async load so server starts quickly
 });
-
-// Load Excel asynchronously
-setTimeout(() => loadExcelData(), 0);
