@@ -1,10 +1,10 @@
 
-/* Global Styling and Reset */
+/* global */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7f9fb; /* Light background for a clean look */
+    background-color: #f7f9fb;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,17 +12,17 @@ body {
     color: #333;
 }
 
-/* Main Content Area */
+/* main */
 .container {
     width: 100%;
-    max-width: 600px; /* Constrain content width for central focus */
-    padding-top: 10vh; /* Push content down from the top */
+    max-width: 600px; 
+    padding-top: 10vh; 
     text-align: center;
 }
 
-/* Header/Logo Section */
+/* Header & Logo */
 h1 {
-    display: none; /* Hide the H1, we'll use the logo and title below */
+    display: none; 
 }
 
 .logo-container {
@@ -30,20 +30,18 @@ h1 {
 }
 
 img {
-    width: 100px; /* Size of the logo icon */
+    width: 100px; 
     height: 100px;
-    /* The logo colors are based on the image (a dark blue/teal and a lighter blue) */
-    /* This is a placeholder icon structure */
 }
 
 .logo-title {
     font-size: 28px;
     font-weight: bold;
-    color: #1a4d9c; /* Dark blue/teal from the image */
+    color: #1a4d9c;
     margin-top: 10px;
 }
 
-/* Search Bar Styling (The main focus) */
+/* Search Bar */
 .search-group {
     position: relative;
     margin-bottom: 20px;
@@ -51,15 +49,9 @@ img {
 }
 
 .search-input {
-    padding: 15px 20px 15px 50px; /* Large padding for a big input, left space for icon */
-    width: calc(100% - 70px); /* Adjust width to fit container after padding/border */
-    border: 1px solid #ddd;
-    border-radius: 24px; /* Rounded corners like the image */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    text-align: left;
+    width: calc(100% - 100px); /* leave space for the button */
+    padding-left: 50px;
+    display: inline-block;
 }
 
 .search-input:focus {
@@ -73,11 +65,11 @@ img {
     left: 20px;
     transform: translateY(-50%);
     color: #777;
-    pointer-events: none; /* Allows clicks to pass through to the input */
-    font-size: 18px; /* For a font-based icon */
+    pointer-events: none; 
+    font-size: 18px; 
 }
 
-/* Additional Links and Text */
+/* link + text */
 .search-link {
     color: #1a4d9c; /* Blue color from the image */
     text-decoration: none;
@@ -92,16 +84,8 @@ img {
     color: #777;
 }
 
-/* Hidden elements (since we only want ONE search bar) */
-#searchBtn {
-    display: none; /* Hide the button visually */
-}
-.input-group {
-    display: none; /* Hide the old input-group structure */
-}
 
-
-/* Preview and Message Styling */
+/* preview message */
 .message {
     margin-top: 10px;
     color: red;
@@ -131,15 +115,9 @@ img {
 }
 
 .generate-button {
-    padding: 10px 20px;
-    background-color: #4CAF50; /* Green button for action */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 15px;
-    transition: background-color 0.3s;
+    width: 80px;
+    display: inline-block;
+    margin-left: 10px;
 }
 
 .generate-button:hover {

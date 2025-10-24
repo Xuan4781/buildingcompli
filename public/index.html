@@ -4,17 +4,162 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOCOTECompli.com</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  
+  <style>
+    /* Global Styling and Reset */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f9fb; /* Light background for a clean look */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* Main Content Area */
+    .container {
+      width: 100%;
+      max-width: 600px; /* Constrain content width for central focus */
+      padding-top: 10vh; /* Push content down from the top */
+      text-align: center;
+    }
+
+    /* Header/Logo Section */
+    h1 {
+      display: none; /* Hide the H1, we'll use the logo and title below */
+    }
+
+    .logo-container {
+      margin-bottom: 30px;
+    }
+
+    img {
+      width: 100px; /* Size of the logo icon */
+      height: 100px;
+      /* The logo colors are based on the image (a dark blue/teal and a lighter blue) */
+      /* This is a placeholder icon structure */
+    }
+
+    .logo-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1a4d9c; /* Dark blue/teal from the image */
+      margin-top: 10px;
+    }
+
+    /* Search Bar Styling (The main focus) */
+    .search-group {
+      position: relative;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .search-input {
+      padding: 15px 20px 15px 50px; /* Large padding for a big input, left space for icon */
+      width: calc(100% - 70px); /* Adjust width to fit container after padding/border */
+      border: 1px solid #ddd;
+      border-radius: 24px; /* Rounded corners like the image */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      text-align: left;
+    }
+
+    .search-input:focus {
+      border-color: #9ac2ff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      color: #777;
+      pointer-events: none; /* Allows clicks to pass through to the input */
+      font-size: 18px; /* For a font-based icon */
+    }
+
+    /* Additional Links and Text */
+    .search-link {
+      color: #1a4d9c; /* Blue color from the image */
+      text-decoration: none;
+      font-size: 14px;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .or-separator {
+      margin: 20px 0;
+      font-size: 16px;
+      color: #777;
+    }
+
+    /* Hidden elements (since we only want ONE search bar) */
+    #searchBtn {
+        display: none; /* Hide the button visually */
+    }
+    .input-group {
+        display: none; /* Hide the old input-group structure */
+    }
+
+
+    /* Preview and Message Styling */
+    .message {
+      margin-top: 10px;
+      color: red;
+      font-weight: bold;
+    }
+
+    .preview-container {
+      margin-top: 30px;
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: left;
+    }
+
+    .preview-container h3 {
+      color: #1a4d9c;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+
+    .preview-container p {
+      line-height: 1.6;
+      margin: 5px 0;
+    }
+
+    .generate-button {
+      padding: 10px 20px;
+      background-color: #4CAF50; /* Green button for action */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+      transition: background-color 0.3s;
+    }
+
+    .generate-button:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-  <h1>SOCOTECompli</h1>
 
+  <h1>SOCOTECompli</h1>
   <div class="input-group">
     <input type="text" id="addressInput" placeholder="Enter building address...">
     <button id="searchBtn">Search</button>
   </div>
-
   <div class="container">
     <div class="logo-container">
       <img src="https://www.ceca.co.uk/wp-content/uploads/2018/06/SOCOTEC-LOGO.png">
@@ -22,13 +167,11 @@
     </div>
 
     <div class="search-group">
-        <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-            </svg>
-        </span>
-        <input type="text" id="mainSearchInput" class="search-input" placeholder="Enter building address">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mainSearchInput" class="search-input" placeholder="Enter building address">
     </div>
+
+    <div id="message" class="message"></div>
 
     <div id="preview" class="preview-container" style="display:none;">
       <h3>Report Preview</h3>
@@ -41,18 +184,20 @@
   </div>
 
   <script>
-
- 
+    // Re-linking the main search input to your existing logic
     const mainSearchInput = document.getElementById('mainSearchInput');
-    const searchBtn = document.getElementById('searchBtn'); 
+    const searchBtn = document.getElementById('searchBtn'); // This button is hidden but will trigger the logic
     const downloadBtn = document.getElementById('downloadBtn');
+    // NOTE: The original addressInput is now an unused element but remains in the HTML
+    // You should use mainSearchInput.value instead of addressInput.value in a real implementation.
     const messageEl = document.getElementById('message');
     const previewEl = document.getElementById('preview');
 
     let currentPreview = null;
 
+    // We'll update the search logic to use the new input field
     const handleSearch = async () => {
-      const address = mainSearchInput.value.trim(); 
+      const address = mainSearchInput.value.trim(); // Use the new main input
       if (!address) {
         messageEl.textContent = "Please enter an address or owner/management company.";
         return;
@@ -62,10 +207,12 @@
       previewEl.style.display = "none";
 
       try {
+        // NOTE: Your original logic used a POST to '/api/search-address'
+        // For a combined input, you might need a different API endpoint or logic to determine the search type.
         const res = await fetch('/api/search-address', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address }) 
+          body: JSON.stringify({ address }) // Sending the single input value
         });
 
         const data = await res.json();
@@ -87,22 +234,24 @@
       }
     };
 
+    // Attach search function to a click on the (now hidden) search button 
+    // or by pressing Enter in the main search bar
     searchBtn.addEventListener('click', handleSearch);
+
     mainSearchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             handleSearch();
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission if input was in a form
         }
     });
 
-    
+    // Download logic remains the same
     downloadBtn.addEventListener('click', async () => {
       if (!currentPreview) {
         messageEl.textContent = "No data to generate report.";
         return;
       }
 
-      //downloading report
       messageEl.textContent = "Generating report...";
 
       try {
