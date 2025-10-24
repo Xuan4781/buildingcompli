@@ -21,7 +21,7 @@ let dataLoaded = false;
 
 function loadExcelData() {
     try {
-        const workbook = xlsx.readFile(join(__dirname, "final_merged.xlsx"));
+        const workbook = xlsx.readFile(join(__dirname, "attempt.xlsx"));
         const sheetName = workbook.SheetNames[0];
         buildingData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { cellDates: true });
         dataLoaded = true;
