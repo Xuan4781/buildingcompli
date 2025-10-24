@@ -110,9 +110,8 @@ app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    loadExcelData();
+    if (!loadExcelData()) console.warn('Excel file may be missing!');
 });
