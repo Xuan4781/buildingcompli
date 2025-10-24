@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Compliance Report Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #333; }
+    .input-group { margin-bottom: 10px; }
+    input { padding: 5px; width: 300px; }
+    button { padding: 6px 12px; margin-left: 5px; cursor: pointer; }
+    .message { margin-top: 10px; color: red; }
+    .preview-container { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+    .generate-button { margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Building Compliance Report Generator</h1>
+
+  <div class="input-group">
+    <input type="text" id="addressInput" placeholder="Enter building address...">
+    <button id="searchBtn">Search</button>
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <div id="preview" class="preview-container" style="display:none;">
+    <h3>Report Preview</h3>
+    <p><strong>Address:</strong> <span id="previewAddress"></span></p>
+    <p><strong>Building Owner/Manager:</strong> <span id="previewOwner"></span></p>
+    <p><strong>Borough:</strong> <span id="previewBorough"></span></p>
+    <p><strong>FISP Compliance Status:</strong> <span id="previewFISP"></span></p>
+    <button id="downloadBtn" class="generate-button">Download Full Report</button>
+  </div>
+
+  <script>
+    const searchBtn = document.getElementById('searchBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const addressInput = document.getElementById('addressInput');
+    const messageEl = document.getElementById('message');
+    const previewEl = document.getElementById('preview');
+
+    let currentPreview = null;
+
+    searchBtn.addEventListener('click', async () => {
+      const address = addressInput.value.trim();
+      if (!address) {
+        messageEl.textContent = "Please enter an address.";
+        return;
+      }
+
+      messageEl.textContent = "Searching...";
+      previewEl.style.display = "none";
+
+      try {
+        const res = await fetch('/api/search-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Address not found.');
+
+        currentPreview = data;
+
+        document.getElementById('previewAddress').textContent = data.Address || 'N/A';
+        document.getElementById('previewOwner').textContent = data["Building Owner/Manager"] || 'N/A';
+        document.getElementById('previewBorough').textContent = data.Borough || 'N/A';
+        document.getElementById('previewFISP').textContent = data["FISP Compliance Status"] || 'N/A';
+
+        previewEl.style.display = "block";
+        messageEl.textContent = '';
+
+      } catch (err) {
+        messageEl.textContent = err.message;
+        currentPreview = null;
+      }
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+      if (!currentPreview) {
+        messageEl.textContent = "No data to generate report.";
+        return;
+      }
+
+      messageEl.textContent = "Generating report...";
+
+      try {
+        const res = await fetch('/api/generate-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: currentPreview.Address })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to generate report.');
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Compliance_Report.docx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        messageEl.textContent = "Report downloaded successfully!";
+
+      } catch (err) {
+        messageEl.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>
