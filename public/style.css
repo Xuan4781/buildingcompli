@@ -1,10 +1,10 @@
 
-/* global */
+/* global values */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7f9fb;
+    background-color: #f7f9fb; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,7 +12,7 @@ body {
     color: #333;
 }
 
-/* main */
+/* main content */
 .container {
     width: 100%;
     max-width: 600px; 
@@ -20,9 +20,9 @@ body {
     text-align: center;
 }
 
-/* Header & Logo */
+/* header & logo */
 h1 {
-    display: none; 
+    display: none;
 }
 
 .logo-container {
@@ -37,11 +37,11 @@ img {
 .logo-title {
     font-size: 28px;
     font-weight: bold;
-    color: #1a4d9c;
+    color: #1a4d9c; 
     margin-top: 10px;
 }
 
-/* Search Bar */
+/* search bar */
 .search-group {
     position: relative;
     margin-bottom: 20px;
@@ -49,9 +49,15 @@ img {
 }
 
 .search-input {
-    width: calc(100% - 100px); /* leave space for the button */
-    padding-left: 50px;
-    display: inline-block;
+    padding: 15px 20px 15px 50px; 
+    width: calc(100% - 70px); 
+    border: 1px solid #ddd;
+    border-radius: 24px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    text-align: left;
 }
 
 .search-input:focus {
@@ -69,9 +75,9 @@ img {
     font-size: 18px; 
 }
 
-/* link + text */
+/* link & text */
 .search-link {
-    color: #1a4d9c; /* Blue color from the image */
+    color: #1a4d9c; 
     text-decoration: none;
     font-size: 14px;
     margin-top: 10px;
@@ -84,8 +90,7 @@ img {
     color: #777;
 }
 
-
-/* preview message */
+/* preview and message */
 .message {
     margin-top: 10px;
     color: red;
@@ -115,9 +120,15 @@ img {
 }
 
 .generate-button {
-    width: 80px;
-    display: inline-block;
-    margin-left: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    transition: background-color 0.3s;
 }
 
 .generate-button:hover {
